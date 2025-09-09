@@ -1,0 +1,9 @@
+{
+  "appId": "com.flowplay.app",
+  "appName": "FlowPlay",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true
+  }
+}

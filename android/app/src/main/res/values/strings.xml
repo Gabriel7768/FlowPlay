@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FlowPlay</string>
+    <string name="title_activity_main">FlowPlay</string>
+    <string name="package_name">com.flowplay.app</string>
+    <string name="custom_url_scheme">com.flowplay.app</string>
+</resources>

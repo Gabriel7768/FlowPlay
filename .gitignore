@@ -1,0 +1,8 @@
+node_modules/
+android/.idea/
+build/
+.gradle/
+.cordova/
+.DS_Store
+*.log
+
