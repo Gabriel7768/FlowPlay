@@ -1,0 +1,35 @@
+[
+  {
+    "titulo": "Python Básico",
+    "pasta": "python",
+    "aulas": [
+      {
+        "titulo": "Aula 1 - Introdução",
+        "arquivo": "aula1.mp4",
+        "thumb": "thumb1.jpg",
+        "descricao": "Introdução ao Python",
+        "duracao": "05:49"
+      },
+      {
+        "titulo": "Aula 2 - Variáveis", 
+        "arquivo": "aula2.mp4",
+        "thumb": "thumb2.jpg",
+        "descricao": "Trabalhando com variáveis",
+        "duracao": "07:32"
+      }
+    ]
+  },
+  {
+    "titulo": "Angular",
+    "pasta": "angular",
+    "aulas": [
+      {
+        "titulo": "Introdução ao Angular",
+        "arquivo": "aula1.mp4",
+        "thumb": "thumb1.png",
+        "descricao": "Primeiros passos no Angular",
+        "duracao": "06:10"
+      }
+    ]
+  }
+]

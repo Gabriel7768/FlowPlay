@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowPlay - Cursos</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4285f4;
+      --secondary-color: #34a853;
+      --background-color: #101520;
+      --card-color: #1f2a3a;
+      --text-color: #ffffff;
+      --border-color: #2d3e50;
+      --hover-color: #2a3c56;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      overflow-x: hidden;
+    }
+    
+    /* Header */
+    .header {
+      background-color: var(--card-color);
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .menu-button {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 24px;
+      cursor: pointer;
+      margin-right: 15px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    
+    .logo i {
+      margin-right: 10px;
+      color: var(--primary-color);
+    }
+    
+    .add-button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+    
+    .add-button i {
+      margin-right: 8px;
+    }
+    
+    /* Menu Lateral */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 300px;
+      height: 100%;
+      background-color: var(--card-color);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+      transition: left 0.3s ease;
+      z-index: 200;
+      overflow-y: auto;
+      padding: 20px 0;
+    }
+    
+    .side-menu.open {
+      left: 0;
+    }
+    
+    .menu-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .close-menu {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    .category-item {
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .category-item:hover {
+      background-color: var(--hover-color);
+    }
+    
+    .category-item i {
+      margin-right: 15px;
+      width: 24px;
+      text-align: center;
+    }
+    
+    .category-item.active {
+      background-color: var(--primary-color);
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 150;
+    }
+    
+    .overlay.visible {
+      display: block;
+    }
+    
+    /* Conteúdo Principal */
+    .main-content {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .search-container {
+      margin-bottom: 25px;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 25px;
+      border: 1px solid var(--border-color);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-color);
+      font-size: 16px;
+    }
+    
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .section-title {
+      margin: 20px 0;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .section-title i {
+      margin-right: 10px;
+      color: var(--primary-color);
+    }
+    
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    
+    .course-card {
+      background-color: var(--card-color);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .course-thumb {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      background: linear-gradient(45deg, #3498db, #8e44ad);
+    }
+    
+    .course-info {
+      padding: 15px;
+    }
+    
+    .course-title {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    
+    .course-description {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    
+    .course-meta {
+      display: flex;
+      justify-content: space-between;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+    }
+    
+    /* Player de Vídeo */
+    .video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 300;
+      padding: 20px;
+    }
+    
+    .video-container.visible {
+      display: flex;
+    }
+    
+    .video-player {
+      width: 100%;
+      max-width: 900px;
+      background-color: black;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .video-info {
+      width: 100%;
+      max-width: 900px;
+      padding: 15px 0;
+    }
+    
+    .video-title {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    
+    .video-course {
+      color: var(--primary-color);
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    
+    .close-video {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    /* Modal de Adicionar Vídeo */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 400;
+    }
+    
+    .modal.visible {
+      display: flex;
+    }
+    
+    .modal-content {
+      background-color: var(--card-color);
+      padding: 25px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-color);
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-color);
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+      margin-left: 10px;
+    }
+    
+    .btn-secondary {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-color);
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .courses-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .side-menu {
+        width: 85%;
+        left: -85%;
+      }
+      
+      .header {
+        flex-wrap: wrap;
+      }
+      
+      .logo {
+        font-size: 18px;
+        margin: 10px 0;
+      }
+      
+      .add-button {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+    }
+    
+    /* Animações */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div style="display: flex; align-items: center;">
+      <button class="menu-button" id="menuButton">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="logo">
+        <i class="fas fa-play-circle"></i>
+        <span>FlowPlay</span>
+      </div>
+    </div>
+    
+    <button class="add-button" id="addVideoButton">
+      <i class="fas fa-plus"></i>
+      Adicionar Vídeo
+    </button>
+  </div>
+  
+  <!-- Menu Lateral -->
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <h2>Categorias</h2>
+      <button class="close-menu" id="closeMenu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="category-item active" data-category="all">
+      <i class="fas fa-th-large"></i>
+      <span>Todos os Cursos</span>
+    </div>
+    
+    <div id="categoriesList">
+      <!-- Categorias serão carregadas dinamicamente -->
+    </div>
+  </div>
+  
+  <!-- Overlay para fechar o menu -->
+  <div class="overlay" id="overlay"></div>
+  
+  <!-- Conteúdo Principal -->
+  <div class="main-content">
+    <div class="search-container">
+      <input type="text" class="search-input" id="searchInput" placeholder="Pesquisar cursos...">
+    </div>
+    
+    <h2 class="section-title">
+      <i class="fas fa-graduation-cap"></i>
+      <span id="contentTitle">Todos os Cursos</span>
+    </h2>
+    
+    <div class="courses-grid" id="coursesGrid">
+      <!-- Os cursos serão carregados via JavaScript -->
+    </div>
+  </div>
+  
+  <!-- Player de Vídeo -->
+  <div class="video-container" id="videoContainer">
+    <button class="close-video" id="closeVideo">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="video-info">
+      <h2 class="video-title" id="videoTitle">Título do Vídeo</h2>
+      <div class="video-course" id="videoCourse">Nome do Curso</div>
+    </div>
+    
+    <video class="video-player" id="videoPlayer" controls>
+      Seu navegador não suporta a tag de vídeo.
+'    </video>
+  </div>
+  
+  <!-- Modal de Adicionar Vídeo -->
+  <div class="modal" id="addVideoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Adicionar Novo Vídeo</h2>
+        <button class="close-modal" id="closeModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="videoTitle">Título do Vídeo</label>
+        <input type="text" class="form-input" id="videoTitleInput" placeholder="Ex: Aula 1 - Introdução">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="videoCategory">Categoria</label>
+        <select class="form-select" id="videoCategorySelect">
+          <option value="">Selecione uma categoria</option>
+          <!-- Categorias serão carregadas dinamicamente -->
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="videoFile">Arquivo de Vídeo</label>
+        <input type="file" class="form-input" id="videoFileInput" accept="video/*">
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn btn-secondary" id="cancelAddVideo">Cancelar</button>
+        <button class="btn btn-primary" id="confirmAddVideo">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dados dos cursos (em um cenário real, isso viria de um arquivo JSON ou seria detectado automaticamente)
+    const cursosData = {
+      "programming": {
+        "title": "Programação do zero",
+        "icon": "fas fa-code",
+        "aulas": [
+          {
+            "titulo": "Introdução à Programação", 
+            "arquivo": "cursos/programacao/aula1.mp4", 
+            "thumb": "cursos/programacao/thumb1.jpg",
+            "descricao": "Aprenda os conceitos básicos de programação",
+            "duracao": "15:30"
+          },
+          {
+            "titulo": "Variáveis e Tipos de Dados", 
+            "arquivo": "cursos/programacao/aula2.mp4", 
+            "thumb": "cursos/programacao/thumb2.jpg",
+            "descricao": "Entenda como armazenar e manipular dados",
+            "duracao": "22:15"
+          }
+        ]
+      },
+      "angular": {
+        "title": "Angular",
+        "icon": "fab fa-angular", 
+        "aulas": [
+          {
+            "titulo": "Criando seu Primeiro Componente", 
+            "arquivo": "cursos/angular/aula1.mp4", 
+            "thumb": "cursos/angular/thumb1.jpg",
+            "descricao": "Desenvolva componentes Angular do zero",
+            "duracao": "28:45"
+          },
+          {
+            "titulo": "Services e Dependency Injection", 
+            "arquivo": "cursos/angular/aula2.mp4", 
+            "thumb": "cursos/angular/thumb2.jpg",
+            "descricao": "Aprenda a usar serviços e injeção de dependência",
+            "duracao": "35:20"
+          }
+        ]
+      },
+      "python": {
+        "title": "Python",
+        "icon": "fab fa-python",
+        "aulas": [
+          {
+            "titulo": "Sintaxe Básica do Python", 
+            "arquivo": "cursos/python/aula1.mp4", 
+            "thumb": "cursos/python/thumb1.jpg",
+            "descricao": "Conheça a sintaxe fundamental da linguagem Python",
+            "duracao": "25:10"
+          },
+          {
+            "titulo": "Estruturas de Controle", 
+            "arquivo": "cursos/python/aula2.mp4", 
+            "thumb": "cursos/python/thumb2.jpg",
+            "descricao": "Domine condicionais e loops em Python",
+            "duracao": "32:05"
+          }
+        ]
+      },
+      "english": {
+        "title": "Inglês",
+        "icon": "fas fa-language",
+        "aulas": [
+          {
+            "titulo": "Cumprimentos e Apresentações", 
+            "arquivo": "cursos/ingles/aula1.mp4", 
+            "thumb": "cursos/ingles/thumb1.jpg",
+            "descricao": "Aprenda a se apresentar e cumprimentar em inglês",
+            "duracao": "18:30"
+          },
+          {
+            "titulo": "Verb To Be e Pronomes", 
+            "arquivo": "cursos/ingles/aula2.mp4", 
+            "thumb": "cursos/ingles/thumb2.jpg",
+            "descricao": "Domine o verbo to be e os pronomes pessoais",
+            "duracao": "24:15"
+          }
+        ]
+      },
+      "latin": {
+        "title": "Latim",
+        "icon": "fas fa-history",
+        "aulas": [
+          {
+            "titulo": "Introdução ao Latim", 
+            "arquivo": "cursos/latim/aula1.mp4", 
+            "thumb": "cursos/latim/thumb1.jpg",
+            "descricao": "Conheça a história e fundamentos do latim",
+            "duracao": "20:40"
+          },
+          {
+            "titulo": "Declinações Básicas", 
+            "arquivo": "cursos/latim/aula2.mp4", 
+            "thumb": "cursos/latim/thumb2.jpg",
+            "descricao": "Aprenda as primeiras declinações do latim",
+            "duracao": "27:20"
+          }
+        ]
+      },
+      "robotics": {
+        "title": "Robótica",
+        "icon": "fas fa-robot",
+        "aulas": [
+          {
+            "titulo": "Componentes Eletrônicos", 
+            "arquivo": "cursos/robotica/aula1.mp4", 
+            "thumb": "cursos/robotica/thumb1.jpg",
+            "descricao": "Conheça os componentes essenciais para robótica",
+            "duracao": "35:50"
+          },
+          {
+            "titulo": "Programação de Microcontroladores", 
+            "arquivo": "cursos/robotica/aula2.mp4", 
+            "thumb": "cursos/robotica/thumb2.jpg",
+            "descricao": "Aprenda a programar microcontroladores para robótica",
+            "duracao": "42:25"
+          }
+        ]
+      },
+      "hacking": {
+        "title": "Hacker",
+        "icon": "fas fa-shield-alt",
+        "aulas": [
+          {
+            "titulo": "Fundamentos de Segurança", 
+            "arquivo": "cursos/hacker/aula1.mp4", 
+            "thumb": "cursos/hacker/thumb1.jpg",
+            "descricao": "Conceitos básicos de segurança da informação",
+            "duracao": "30:15"
+          },
+          {
+            "titulo": "Testes de Invasão Ética", 
+            "arquivo": "cursos/hacker/aula2.mp4", 
+            "thumb": "cursos/hacker/thumb2.jpg",
+            "descricao": "Aprenda técnicas éticas de teste de invasão",
+            "duracao": "38:40"
+          }
+        ]
+      }
+    };
+
+    // Elementos DOM
+    const menuButton = document.getElementById('menuButton');
+    const closeMenu = document.getElementById('closeMenu');
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('overlay');
+    const categoriesList = document.getElementById('categoriesList');
+    const contentTitle = document.getElementById('contentTitle');
+    const coursesGrid = document.getElementById('coursesGrid');
+    const searchInput = document.getElementById('searchInput');
+    const videoContainer = document.getElementById('videoContainer');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const videoTitle = document.getElementById('videoTitle');
+    const videoCourse = document.getElementById('videoCourse');
+    const closeVideo = document.getElementById('closeVideo');
+    const addVideoButton = document.getElementById('addVideoButton');
+    const addVideoModal = document.getElementById('addVideoModal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelAddVideo = document.getElementById('cancelAddVideo');
+    const confirmAddVideo = document.getElementById('confirmAddVideo');
+    const videoCategorySelect = document.getElementById('videoCategorySelect');
+
+    // Estado da aplicação
+    let allCourses = [];
+    let currentCategory = 'all';
+    let customVideos = JSON.parse(localStorage.getItem('customVideos')) || {};
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAllCourses();
+      renderCategories();
+      setupEventListeners();
+      populateCategorySelect();
+    });
+
+    // Configurar event listeners
+    function setupEventListeners() {
+      menuButton.addEventListener('click', openMenu);
+      closeMenu.addEventListener('click', closeMenuFunc);
+      overlay.addEventListener('click', closeMenuFunc);
+      searchInput.addEventListener('input', handleSearch);
+      closeVideo.addEventListener('click', closeVideoPlayer);
+      addVideoButton.addEventListener('click', openAddVideoModal);
+      closeModal.addEventListener('click', closeAddVideoModal);
+      cancelAddVideo.addEventListener('click', closeAddVideoModal);
+      confirmAddVideo.addEventListener('click', addNewVideo);
+    }
+
+    // Carregar todos os cursos
+    function loadAllCourses() {
+      allCourses = [];
+      
+      // Adicionar cursos padrão
+      for (const categoryKey in cursosData) {
+        const category = cursosData[categoryKey];
+        category.aulas.forEach(aula => {
+          allCourses.push({
+            ...aula,
+            category: categoryKey,
+            categoryName: category.title,
+            isCustom: false
+          });
+        });
+      }
+      
+      // Adicionar vídeos personalizados
+      for (const categoryKey in customVideos) {
+        customVideos[categoryKey].forEach(aula => {
+          allCourses.push({
+            ...aula,
+            category: categoryKey,
+            categoryName: getCategoryName(categoryKey),
+            isCustom: true
+          });
+        });
+      }
+      
+      renderCourses(allCourses);
+    }
+
+    // Obter nome da categoria
+    function getCategoryName(categoryKey) {
+      if (cursosData[categoryKey]) {
+        return cursosData[categoryKey].title;
+      }
+      return categoryKey; // Para categorias personalizadas
+    }
+
+    // Renderizar categorias no menu lateral
+    function renderCategories() {
+      categoriesList.innerHTML = '';
+      
+      // Adicionar categorias padrão
+      for (const categoryKey in cursosData) {
+        const category = cursosData[categoryKey];
+        const categoryItem = document.createElement('div');
+        categoryItem.className = 'category-item';
+        categoryItem.setAttribute('data-category', categoryKey);
+        categoryItem.innerHTML = `
+          <i class="${category.icon}"></i>
+          <span>${category.title}</span>
+        `;
+        categoryItem.addEventListener('click', () => {
+          selectCategory(categoryKey);
+        });
+        categoriesList.appendChild(categoryItem);
+      }
+      
+      // Adicionar categorias personalizadas
+      for (const categoryKey in customVideos) {
+        if (!cursosData[categoryKey]) {
+          const categoryItem = document.createElement('div');
+          categoryItem.className = 'category-item';
+          categoryItem.setAttribute('data-category', categoryKey);
+          categoryItem.innerHTML = `
+            <i class="fas fa-folder-plus"></i>
+            <span>${categoryKey}</span>
+          `;
+          categoryItem.addEventListener('click', () => {
+            selectCategory(categoryKey);
+          });
+          categoriesList.appendChild(categoryItem);
+        }
+      }
+    }
+
+    // Popular select de categorias no modal
+    function populateCategorySelect() {
+      videoCategorySelect.innerHTML = '<option value="">Selecione uma categoria</option>';
+      
+      // Adicionar categorias padrão
+      for (const categoryKey in cursosData) {
+        const category = cursosData[categoryKey];
+        const option = document.createElement('option');
+        option.value = categoryKey;
+        option.textContent = category.title;
+        videoCategorySelect.appendChild(option);
+      }
+      
+      // Adicionar categorias personalizadas
+      for (const categoryKey in customVideos) {
+        if (!cursosData[categoryKey]) {
+          const option = document.createElement('option');
+          option.value = categoryKey;
+          option.textContent = categoryKey;
+          videoCategorySelect.appendChild(option);
+        }
+      }
+      
+      // Adicionar opção para nova categoria
+      const newOption = document.createElement('option');
+      newOption.value = "new";
+      newOption.textContent = "+ Nova Categoria";
+      videoCategorySelect.appendChild(newOption);
+    }
+
+    // Renderizar cursos na grade
+    function renderCourses(courses) {
+      coursesGrid.innerHTML = '';
+      
+      if (courses.length === 0) {
+        coursesGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+            <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+            <h3>Nenhum curso encontrado</h3>
+            <p>Tente ajustar os termos da sua pesquisa</p>
+          </div>
+        `;
+        return;
+      }
+      
+      courses.forEach(curso => {
+        const courseCard = document.createElement('div');
+        courseCard.className = 'course-card fade-in';
+        
+        // Cor de fundo baseada na categoria
+        const hue = stringToHue(curso.category);
+        const gradient = `linear-gradient(45deg, hsl(${hue}, 70%, 50%), hsl(${hue + 30}, 70%, 50%))`;
+        
+        courseCard.innerHTML = `
+          <div class="course-thumb" style="background: ${gradient}">
+            <i class="${curso.isCustom ? 'fas fa-video' : (cursosData[curso.category]?.icon || 'fas fa-film')}" style="color: white;"></i>
+          </div>
+          <div class="course-info">
+            <h3 class="course-title">${curso.titulo}</h3>
+            <p class="course-description">${curso.descricao || 'Assista a esta aula para aprender conceitos importantes'}</p>
+            <div class="course-meta">
+              <span>${curso.categoryName}</span>
+              <span>${curso.duracao || '--:--'}</span>
+            </div>
+          </div>
+        `;
+        
+        courseCard.addEventListener('click', () => {
+          playVideo(curso.arquivo, curso.titulo, curso.categoryName);
+        });
+        
+        coursesGrid.appendChild(courseCard);
+      });
+    }
+
+    // Gerar cor baseada em string (para thumbnails)
+    function stringToHue(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return hash % 360;
+    }
+
+    // Abrir menu lateral
+    function openMenu() {
+      sideMenu.classList.add('open');
+      overlay.classList.add('visible');
+    }
+
+    // Fechar menu lateral
+    function closeMenuFunc() {
+      sideMenu.classList.remove('open');
+      overlay.classList.remove('visible');
+    }
+
+    // Selecionar categoria
+    function selectCategory(category) {
+      currentCategory = category;
+      
+      // Atualizar UI
+      document.querySelectorAll('.category-item').forEach(item => {
+        if (item.getAttribute('data-category') === category) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+      
+      // Atualizar conteúdo
+      if (category === 'all') {
+        contentTitle.textContent = 'Todos os Cursos';
+        renderCourses(allCourses);
+      } else {
+        contentTitle.textContent = getCategoryName(category);
+        const categoryCourses = allCourses.filter(course => course.category === category);
+        renderCourses(categoryCourses);
+      }
+      
+      closeMenuFunc();
+    }
+
+    // Manipular pesquisa
+    function handleSearch() {
+      const searchTerm = searchInput.value.toLowerCase();
+      
+      if (searchTerm === '') {
+        if (currentCategory === 'all') {
+          renderCourses(allCourses);
+        } else {
+          const categoryCourses = allCourses.filter(course => course.category === currentCategory);
+          renderCourses(categoryCourses);
+        }
+        return;
+      }
+      
+      const filteredCourses = allCourses.filter(curso => 
+        curso.titulo.toLowerCase().includes(searchTerm) || 
+        (curso.descricao && curso.descricao.toLowerCase().includes(searchTerm)) ||
+        curso.categoryName.toLowerCase().includes(searchTerm)
+      );
+      
+      renderCourses(filteredCourses);
+    }
+
+    // Reproduzir vídeo
+    function playVideo(videoSrc, title, course) {
+      videoPlayer.src = videoSrc;
+      videoTitle.textContent = title;
+      videoCourse.textContent = course;
+      videoContainer.classList.add('visible');
+      videoPlayer.play();
+      
+      // Salvar progresso do vídeo
+      videoPlayer.ontimeupdate = function() {
+        localStorage.setItem(`progress_${videoSrc}`, videoPlayer.currentTime);
+      };
+      
+      // Restaurar progresso se existir
+      const savedProgress = localStorage.getItem(`progress_${videoSrc}`);
+      if (savedProgress) {
+        videoPlayer.currentTime = parseFloat(savedProgress);
+      }
+    }
+
+    // Fechar player de vídeo
+    function closeVideoPlayer() {
+      videoPlayer.pause();
+      videoContainer.classList.remove('visible');
+    }
+
+    // Abrir modal de adicionar vídeo
+    function openAddVideoModal() {
+      addVideoModal.classList.add('visible');
+    }
+
+    // Fechar modal de adicionar vídeo
+    function closeAddVideoModal() {
+      addVideoModal.classList.remove('visible');
+      // Limpar formulário
+      document.getElementById('videoTitleInput').value = '';
+      document.getElementById('videoFileInput').value = '';
+      videoCategorySelect.value = '';
+    }
+
+    // Adicionar novo vídeo
+    function addNewVideo() {
+      const title = document.getElementById('videoTitleInput').value.trim();
+      const category = videoCategorySelect.value;
+      const fileInput = document.getElementById('videoFileInput');
+      
+      if (!title || !category || !fileInput.files.length) {
+        alert('Por favor, preencha todos os campos e selecione um arquivo de vídeo.');
+        return;
+      }
+      
+      // Criar URL para o arquivo (em um app real, isso seria enviado para um servidor)
+      const file = fileInput.files[0];
+      const videoUrl = URL.createObjectURL(file);
+      
+      // Determinar categoria
+      let selectedCategory = category;
+      if (category === 'new') {
+        selectedCategory = prompt('Digite o nome da nova categoria:');
+        if (!selectedCategory) return;
+      }
+      
+      // Adicionar vídeo aos dados
+      if (!customVideos[selectedCategory]) {
+        customVideos[selectedCategory] = [];
+      }
+      
+      customVideos[selectedCategory].push({
+        titulo: title,
+        arquivo: videoUrl,
+        descricao: 'Vídeo adicionado manualmente',
+        duracao: '--:--'
+      });
+      
+      // Salvar no localStorage
+      localStorage.setItem('customVideos', JSON.stringify(customVideos));
+      
+      // Recarregar cursos
+      loadAllCourses();
+      renderCategories();
+      populateCategorySelect();
+      
+      // Fechar modal
+      closeAddVideoModal();
+      
+      alert('Vídeo adicionado com sucesso!');
+    }
+  </script>
+</body>
+</html>
