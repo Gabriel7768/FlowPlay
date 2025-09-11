@@ -1,427 +1,245 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlowPlay</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .video-card:hover {
-            transform: scale(1.03);
-            transition: transform 0.2s;
-        }
-        .category-row {
-            scrollbar-width: thin;
-        }
-        .category-row::-webkit-scrollbar {
-            height: 6px;
-        }
-        .category-row::-webkit-scrollbar-thumb {
-            background-color: #4b5563;
-            border-radius: 3px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowPlay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .video-card:hover { transform: scale(1.03); transition: transform 0.2s; }
+    .category-row { scrollbar-width: thin; }
+    .category-row::-webkit-scrollbar { height: 6px; }
+    .category-row::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 3px; }
+  </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
-    <!-- Header -->
-    <header class="bg-gray-800 p-4 flex items-center justify-between shadow-lg">
-        <div class="flex items-center space-x-3">
-            <div class="bg-blue-600 w-10 h-10 rounded-md flex items-center justify-center">
-                <span class="font-bold text-white">FP</span>
-            </div>
-            <h1 class="text-xl font-bold">FlowPlay</h1>
+  <!-- Header -->
+  <header class="bg-gray-800 p-4 flex items-center justify-between shadow-lg">
+    <div class="flex items-center space-x-3">
+      <div class="bg-blue-600 w-10 h-10 rounded-md flex items-center justify-center">
+        <span class="font-bold text-white">FP</span>
+      </div>
+      <h1 class="text-xl font-bold">FlowPlay</h1>
+    </div>
+    <button id="uploadBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md font-medium">
+      Adicionar Vídeo
+    </button>
+  </header>
+
+  <main class="container mx-auto p-4">
+    <!-- Filtros -->
+    <div class="mb-6 flex flex-wrap gap-3">
+      <select id="categoryFilter" class="bg-gray-700 text-white p-2 rounded-md">
+        <option value="all">Todas as categorias</option>
+      </select>
+      <input type="text" id="searchFilter" placeholder="Buscar vídeos..."
+             class="bg-gray-700 text-white p-2 rounded-md flex-grow max-w-md">
+    </div>
+
+    <!-- Lista de Vídeos -->
+    <div id="videoList" class="space-y-8"></div>
+
+    <!-- Mensagem quando não há vídeos -->
+    <div id="emptyState" class="text-center py-12 hidden">
+      <div class="bg-gray-800 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
+        <span class="text-4xl">📂</span>
+      </div>
+      <h2 class="text-xl font-semibold text-gray-400">Nenhum vídeo encontrado</h2>
+      <p class="text-gray-500 mt-2">Adicione seu primeiro vídeo clicando no botão acima.</p>
+    </div>
+  </main>
+
+  <!-- Modal de Upload -->
+  <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+    <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+      <h2 class="text-xl font-bold mb-4">Adicionar Vídeo</h2>
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Selecionar arquivo de vídeo</label>
+        <input type="file" id="videoFile" accept="video/*" class="w-full p-2 bg-gray-700 rounded-md">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Nome do vídeo</label>
+        <input type="text" id="videoName" placeholder="Digite um nome" class="w-full p-2 bg-gray-700 rounded-md">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Categoria</label>
+        <div class="flex gap-2">
+          <select id="videoCategory" class="flex-grow p-2 bg-gray-700 rounded-md"></select>
+          <input type="text" id="newCategory" placeholder="Nova categoria" class="flex-grow p-2 bg-gray-700 rounded-md hidden">
         </div>
-        <button id="uploadBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md font-medium">
-            Adicionar Vídeo
+        <button id="toggleCategory" class="text-blue-400 text-sm mt-1">+ Criar nova categoria</button>
+      </div>
+      <div class="flex justify-end gap-3 mt-6">
+        <button id="cancelUpload" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md">Cancelar</button>
+        <button id="saveVideo" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal do Player -->
+  <div id="playerModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center hidden z-50">
+    <div class="w-full max-w-4xl bg-black rounded-lg overflow-hidden">
+      <div class="relative">
+        <button id="closePlayer" class="absolute top-3 right-3 z-10 bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
         </button>
-    </header>
-
-    <main class="container mx-auto p-4">
-        <!-- Filtros -->
-        <div class="mb-6 flex flex-wrap gap-3">
-            <select id="categoryFilter" class="bg-gray-700 text-white p-2 rounded-md">
-                <option value="all">Todas as categorias</option>
-                <!-- Categorias serão preenchidas via JS -->
-            </select>
-            <input type="text" id="searchFilter" placeholder="Buscar vídeos..." 
-                   class="bg-gray-700 text-white p-2 rounded-md flex-grow max-w-md">
-        </div>
-
-        <!-- Lista de Vídeos (estilo Netflix) -->
-        <div id="videoList" class="space-y-8">
-            <!-- Categorias serão renderizadas aqui -->
-        </div>
-
-        <!-- Mensagem quando não há vídeos -->
-        <div id="emptyState" class="text-center py-12 hidden">
-            <div class="bg-gray-800 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span class="text-4xl">🎬</span>
-            </div>
-            <h2 class="text-xl font-semibold text-gray-400">Nenhum vídeo encontrado</h2>
-            <p class="text-gray-500 mt-2">Adicione seu primeiro vídeo clicando no botão acima.</p>
-        </div>
-    </main>
-
-    <!-- Modal de Upload -->
-    <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h2 class="text-xl font-bold mb-4">Adicionar Vídeo</h2>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-1">Selecionar arquivo de vídeo</label>
-                <input type="file" id="videoFile" accept="video/*" class="w-full p-2 bg-gray-700 rounded-md">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-1">Nome do vídeo</label>
-                <input type="text" id="videoName" placeholder="Digite um nome" class="w-full p-2 bg-gray-700 rounded-md">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-1">Categoria</label>
-                <div class="flex gap-2">
-                    <select id="videoCategory" class="flex-grow p-2 bg-gray-700 rounded-md">
-                        <option value="Filmes">Filmes</option>
-                        <option value="Séries">Séries</option>
-                        <option value="Documentários">Documentários</option>
-                        <option value="Educativo">Educativo</option>
-                        <option value="Musica">Música</option>
-                        <option value="Outros">Outros</option>
-                    </select>
-                    <input type="text" id="newCategory" placeholder="Nova categoria" class="flex-grow p-2 bg-gray-700 rounded-md hidden">
-                </div>
-                <button id="toggleCategory" class="text-blue-400 text-sm mt-1">+ Criar nova categoria</button>
-            </div>
-            
-            <div class="flex justify-end gap-3 mt-6">
-                <button id="cancelUpload" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md">Cancelar</button>
-                <button id="saveVideo" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md">Salvar</button>
-            </div>
-        </div>
+        <video id="videoPlayer" controls class="w-full h-auto" style="max-height: 80vh;"></video>
+      </div>
+      <div class="p-4">
+        <h2 id="playerTitle" class="text-xl font-bold mb-2"></h2>
+        <p id="playerCategory" class="text-gray-400"></p>
+      </div>
     </div>
+  </div>
 
-    <!-- Modal do Player -->
-    <div id="playerModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center hidden z-50">
-        <div class="w-full max-w-4xl bg-black rounded-lg overflow-hidden">
-            <div class="relative">
-                <button id="closePlayer" class="absolute top-3 right-3 z-10 bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-                <video id="videoPlayer" controls class="w-full h-auto" style="max-height: 80vh;"></video>
-            </div>
-            <div class="p-4">
-                <h2 id="playerTitle" class="text-xl font-bold mb-2"></h2>
-                <p id="playerCategory" class="text-gray-400"></p>
-            </div>
-        </div>
-    </div>
+  <script>
+    // Dados locais
+    let videos = JSON.parse(localStorage.getItem('flowplay_videos')) || [];
+    let categories = JSON.parse(localStorage.getItem('flowplay_categories')) ||
+                     ['Filmes','Séries','Documentários','Educativo','Música','Outros'];
 
-    <script>
-        // Variáveis globais
-        let videos = JSON.parse(localStorage.getItem('flowplay_videos')) || [];
-        let categories = JSON.parse(localStorage.getItem('flowplay_categories')) || 
-                         ['Filmes', 'Séries', 'Documentários', 'Educativo', 'Musica', 'Outros'];
+    // DOM
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadModal = document.getElementById('uploadModal');
+    const cancelUpload = document.getElementById('cancelUpload');
+    const saveVideoBtn = document.getElementById('saveVideo');
+    const videoFileInput = document.getElementById('videoFile');
+    const videoNameInput = document.getElementById('videoName');
+    const videoCategorySelect = document.getElementById('videoCategory');
+    const newCategoryInput = document.getElementById('newCategory');
+    const toggleCategoryBtn = document.getElementById('toggleCategory');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const searchFilter = document.getElementById('searchFilter');
+    const videoList = document.getElementById('videoList');
+    const emptyState = document.getElementById('emptyState');
+    const playerModal = document.getElementById('playerModal');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const closePlayer = document.getElementById('closePlayer');
+    const playerTitle = document.getElementById('playerTitle');
+    const playerCategory = document.getElementById('playerCategory');
 
-        // Elementos DOM
-        const uploadBtn = document.getElementById('uploadBtn');
-        const uploadModal = document.getElementById('uploadModal');
-        const cancelUpload = document.getElementById('cancelUpload');
-        const saveVideoBtn = document.getElementById('saveVideo');
-        const videoFileInput = document.getElementById('videoFile');
-        const videoNameInput = document.getElementById('videoName');
-        const videoCategorySelect = document.getElementById('videoCategory');
-        const newCategoryInput = document.getElementById('newCategory');
-        const toggleCategoryBtn = document.getElementById('toggleCategory');
-        const categoryFilter = document.getElementById('categoryFilter');
-        const searchFilter = document.getElementById('searchFilter');
-        const videoList = document.getElementById('videoList');
-        const emptyState = document.getElementById('emptyState');
-        const playerModal = document.getElementById('playerModal');
-        const videoPlayer = document.getElementById('videoPlayer');
-        const closePlayer = document.getElementById('closePlayer');
-        const playerTitle = document.getElementById('playerTitle');
-        const playerCategory = document.getElementById('playerCategory');
+    // --- RENDER ---
+    function renderVideos() {
+      videoList.innerHTML = '';
+      const search = searchFilter.value.toLowerCase();
+      const selectedCategory = categoryFilter.value;
 
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', () => {
-            renderVideoList();
-            updateCategoryFilter();
-            
-            // Event Listeners
-            uploadBtn.addEventListener('click', () => uploadModal.classList.remove('hidden'));
-            cancelUpload.addEventListener('click', () => uploadModal.classList.add('hidden'));
-            saveVideoBtn.addEventListener('click', saveVideo);
-            toggleCategoryBtn.addEventListener('click', toggleCategoryInput);
-            categoryFilter.addEventListener('change', renderVideoList);
-            searchFilter.addEventListener('input', renderVideoList);
-            closePlayer.addEventListener('click', () => {
-                // Salvar progresso antes de fechar
-                if (videoPlayer.src) {
-                    const currentVideoName = videoPlayer.dataset.videoName;
-                    saveProgress(currentVideoName, videoPlayer.currentTime);
-                }
-                playerModal.classList.add('hidden');
-                videoPlayer.pause();
-                videoPlayer.src = '';
-            });
-            
-            // Fechar modais clicando fora
-            uploadModal.addEventListener('click', (e) => {
-                if (e.target === uploadModal) uploadModal.classList.add('hidden');
-            });
-            
-            playerModal.addEventListener('click', (e) => {
-                if (e.target === playerModal) {
-                    if (videoPlayer.src) {
-                        const currentVideoName = videoPlayer.dataset.videoName;
-                        saveProgress(currentVideoName, videoPlayer.currentTime);
-                    }
-                    playerModal.classList.add('hidden');
-                    videoPlayer.pause();
-                    videoPlayer.src = '';
-                }
-            });
-            
-            // Salvar progresso periodicamente durante a reprodução
-            videoPlayer.addEventListener('timeupdate', () => {
-                if (!videoPlayer.paused && videoPlayer.dataset.videoName) {
-                    saveProgress(videoPlayer.dataset.videoName, videoPlayer.currentTime);
-                }
-            });
+      const filtered = videos.filter(v =>
+        (selectedCategory === 'all' || v.category === selectedCategory) &&
+        v.name.toLowerCase().includes(search)
+      );
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else emptyState.classList.add('hidden');
+
+      filtered.forEach(video => {
+        const card = document.createElement('div');
+        card.className = "bg-gray-800 p-4 rounded-lg shadow-md video-card cursor-pointer";
+        card.innerHTML = `
+          <h3 class="text-lg font-bold mb-2">${video.name}</h3>
+          <p class="text-gray-400 text-sm mb-2">${video.category}</p>
+          <video src="${video.url}" class="w-full rounded-md mb-2" preload="metadata"></video>
+        `;
+        card.onclick = () => openPlayer(video);
+        videoList.appendChild(card);
+      });
+    }
+
+    function renderCategories() {
+      categoryFilter.innerHTML = `<option value="all">Todas as categorias</option>`;
+      videoCategorySelect.innerHTML = '';
+      categories.forEach(cat => {
+        categoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
+        videoCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+      });
+    }
+
+    // --- PLAYER ---
+    function openPlayer(video) {
+      playerModal.classList.remove('hidden');
+      videoPlayer.src = video.url;
+      playerTitle.textContent = video.name;
+      playerCategory.textContent = video.category;
+    }
+    closePlayer.onclick = () => {
+      playerModal.classList.add('hidden');
+      videoPlayer.pause();
+    };
+
+    // --- UPLOAD ---
+    uploadBtn.onclick = () => uploadModal.classList.remove('hidden');
+    cancelUpload.onclick = () => uploadModal.classList.add('hidden');
+
+    toggleCategoryBtn.onclick = () => {
+      newCategoryInput.classList.toggle('hidden');
+      videoCategorySelect.classList.toggle('hidden');
+    };
+
+    saveVideoBtn.onclick = () => {
+      const file = videoFileInput.files[0];
+      const name = videoNameInput.value.trim();
+      const category = newCategoryInput.classList.contains('hidden')
+        ? videoCategorySelect.value
+        : newCategoryInput.value.trim();
+
+      if (!file || !name || !category) return alert("Preencha todos os campos");
+
+      const url = URL.createObjectURL(file);
+      videos.push({ name, category, url });
+      if (!categories.includes(category)) categories.push(category);
+
+      localStorage.setItem('flowplay_videos', JSON.stringify(videos));
+      localStorage.setItem('flowplay_categories', JSON.stringify(categories));
+
+      renderCategories();
+      renderVideos();
+      uploadModal.classList.add('hidden');
+      videoFileInput.value = '';
+      videoNameInput.value = '';
+      newCategoryInput.value = '';
+    };
+
+    // --- AUTOMÁTICO (cursos.json) ---
+    async function carregarCursosAutomaticos() {
+      try {
+        const response = await fetch('cursos/cursos.json');
+        if (!response.ok) return;
+        const cursosExternos = await response.json();
+
+        cursosExternos.forEach(curso => {
+          curso.aulas.forEach(aula => {
+            const url = `cursos/${curso.pasta}/${aula.arquivo}`;
+            const name = aula.titulo;
+            const category = curso.titulo;
+            if (!videos.some(v => v.name === name)) {
+              videos.push({ name, category, url });
+              if (!categories.includes(category)) categories.push(category);
+            }
+          });
         });
 
-        // Alternar entre selecionar categoria existente e criar nova
-        function toggleCategoryInput() {
-            const isCreatingNew = newCategoryInput.classList.contains('hidden');
-            
-            if (isCreatingNew) {
-                newCategoryInput.classList.remove('hidden');
-                videoCategorySelect.classList.add('hidden');
-                toggleCategoryBtn.textContent = '← Usar categoria existente';
-            } else {
-                newCategoryInput.classList.add('hidden');
-                videoCategorySelect.classList.remove('hidden');
-                toggleCategoryBtn.textContent = '+ Criar nova categoria';
-            }
-        }
+        localStorage.setItem('flowplay_videos', JSON.stringify(videos));
+        localStorage.setItem('flowplay_categories', JSON.stringify(categories));
 
-        // Salvar vídeo
-        function saveVideo() {
-            const file = videoFileInput.files[0];
-            const name = videoNameInput.value.trim();
-            let category = newCategoryInput.classList.contains('hidden') 
-                ? videoCategorySelect.value 
-                : newCategoryInput.value.trim();
-            
-            if (!file) {
-                alert('Por favor, selecione um arquivo de vídeo.');
-                return;
-            }
-            
-            if (!name) {
-                alert('Por favor, digite um nome para o vídeo.');
-                return;
-            }
-            
-            if (!category) {
-                alert('Por favor, selecione ou digite uma categoria.');
-                return;
-            }
-            
-            // Criar URL para o arquivo
-            const videoUrl = URL.createObjectURL(file);
-            
-            // Adicionar nova categoria se for o caso
-            if (!categories.includes(category)) {
-                categories.push(category);
-                localStorage.setItem('flowplay_categories', JSON.stringify(categories));
-                updateCategoryFilter();
-            }
-            
-            // Adicionar vídeo à lista
-            videos.push({
-                id: Date.now(),
-                name,
-                category,
-                url: videoUrl,
-                file: file.name,
-                added: new Date().toISOString()
-            });
-            
-            // Salvar no localStorage
-            localStorage.setItem('flowplay_videos', JSON.stringify(videos));
-            
-            // Limpar formulário e fechar modal
-            videoFileInput.value = '';
-            videoNameInput.value = '';
-            newCategoryInput.value = '';
-            if (!newCategoryInput.classList.contains('hidden')) toggleCategoryInput();
-            
-            uploadModal.classList.add('hidden');
-            renderVideoList();
-        }
+        renderCategories();
+        renderVideos();
+      } catch (err) {
+        console.log("Nenhum cursos.json detectado");
+      }
+    }
 
-        // Atualizar filtro de categorias
-        function updateCategoryFilter() {
-            // Manter a opção selecionada atual
-            const currentValue = categoryFilter.value;
-            
-            // Limpar e adicionar opção padrão
-            categoryFilter.innerHTML = '<option value="all">Todas as categorias</option>';
-            
-            // Adicionar categorias
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                categoryFilter.appendChild(option);
-            });
-            
-            // Restaurar seleção anterior se ainda existir
-            if (categories.includes(currentValue)) {
-                categoryFilter.value = currentValue;
-            }
-        }
-
-        // Renderizar lista de vídeos no estilo Netflix
-        function renderVideoList() {
-            const selectedCategory = categoryFilter.value;
-            const searchTerm = searchFilter.value.toLowerCase();
-            
-            // Filtrar vídeos
-            let filteredVideos = videos;
-            
-            if (selectedCategory !== 'all') {
-                filteredVideos = filteredVideos.filter(video => video.category === selectedCategory);
-            }
-            
-            if (searchTerm) {
-                filteredVideos = filteredVideos.filter(video => 
-                    video.name.toLowerCase().includes(searchTerm) || 
-                    video.category.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            // Mostrar estado vazio se não houver vídeos
-            if (filteredVideos.length === 0) {
-                videoList.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            
-            videoList.classList.remove('hidden');
-            emptyState.classList.add('hidden');
-            
-            // Agrupar vídeos por categoria
-            const groupedVideos = {};
-            filteredVideos.forEach(video => {
-                if (!groupedVideos[video.category]) {
-                    groupedVideos[video.category] = [];
-                }
-                groupedVideos[video.category].push(video);
-            });
-            
-            // Renderizar categorias
-            videoList.innerHTML = '';
-            Object.keys(groupedVideos).forEach(category => {
-                const categorySection = document.createElement('div');
-                categorySection.className = 'category-section';
-                categorySection.innerHTML = `
-                    <h2 class="text-xl font-bold mb-3">${category}</h2>
-                    <div class="category-row flex gap-4 overflow-x-auto pb-4">
-                        ${groupedVideos[category].map(video => `
-                            <div class="video-card flex-none w-48 bg-gray-800 rounded-lg overflow-hidden cursor-pointer" data-id="${video.id}">
-                                <div class="relative">
-                                    <video class="w-full h-28 object-cover" preload="metadata">
-                                        <source src="${video.url}#t=0.5" type="${getVideoType(video.file)}">
-                                    </video>
-                                    <div class="absolute bottom-2 right-2 bg-black bg-opacity-70 px-1 text-xs rounded">
-                                        ${formatDuration(getVideoProgress(video.name))}
-                                    </div>
-                                </div>
-                                <div class="p-3">
-                                    <h3 class="font-semibold text-sm truncate">${video.name}</h3>
-                                    <p class="text-xs text-gray-400 mt-1">Adicionado em ${formatDate(video.added)}</p>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                videoList.appendChild(categorySection);
-            });
-            
-            // Adicionar event listeners para os cards de vídeo
-            document.querySelectorAll('.video-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const videoId = parseInt(card.dataset.id);
-                    const video = videos.find(v => v.id === videoId);
-                    if (video) {
-                        playVideo(video);
-                    }
-                });
-            });
-        }
-
-        // Reproduzir vídeo
-        function playVideo(video) {
-            videoPlayer.src = video.url;
-            playerTitle.textContent = video.name;
-            playerCategory.textContent = `Categoria: ${video.category}`;
-            videoPlayer.dataset.videoName = video.name;
-            
-            // Restaurar progresso se existir
-            const progress = getVideoProgress(video.name);
-            if (progress > 0) {
-                videoPlayer.currentTime = progress;
-            }
-            
-            playerModal.classList.remove('hidden');
-            videoPlayer.play().catch(e => console.log('Autoplay prevented:', e));
-            
-            // Tentar entrar em tela cheia no mobile
-            if (videoPlayer.requestFullscreen && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
-                videoPlayer.requestFullscreen().catch(e => console.log('Fullscreen error:', e));
-            }
-        }
-
-        // Obter progresso salvo do vídeo
-        function getVideoProgress(videoName) {
-            const progressData = JSON.parse(localStorage.getItem('flowplay_progress') || '{}');
-            return progressData[videoName] || 0;
-        }
-
-        // Salvar progresso do vídeo
-        function saveProgress(videoName, currentTime) {
-            const progressData = JSON.parse(localStorage.getItem('flowplay_progress') || '{}');
-            progressData[videoName] = currentTime;
-            localStorage.setItem('flowplay_progress', JSON.stringify(progressData));
-        }
-
-        // Obter tipo MIME do vídeo baseado na extensão do arquivo
-        function getVideoType(filename) {
-            const extension = filename.split('.').pop().toLowerCase();
-            if (['mp4', 'm4v'].includes(extension)) return 'video/mp4';
-            if (['webm'].includes(extension)) return 'video/webm';
-            if (['ogv', 'ogg'].includes(extension)) return 'video/ogg';
-            return 'video/mp4'; // padrão
-        }
-
-        // Formatar data
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('pt-BR');
-        }
-
-        // Formatar duração (segundos para MM:SS)
-        function formatDuration(seconds) {
-            if (!seconds || seconds < 1) return '';
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-    </script>
+    // --- INIT ---
+    window.onload = () => {
+      renderCategories();
+      renderVideos();
+      carregarCursosAutomaticos();
+    };
+    categoryFilter.onchange = renderVideos;
+    searchFilter.oninput = renderVideos;
+  </script>
 </body>
 </html>
