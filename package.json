@@ -4,7 +4,13 @@
   "description": "Aplicativo de gerenciamento de vídeos",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "mkdir -p www && echo \"Build finalizado (arquivos já estão em www/)\"",
+    "dev": "npx live-server www --port=3000",
+    "cap:sync": "npx cap sync",
+    "cap:android": "npx cap add android && npx cap sync",
+    "cap:run": "npx cap run android",
+    "cap:open": "npx cap open android"
   },
   "keywords": [
     "video",
@@ -14,7 +20,8 @@
   "author": "FlowPlay",
   "license": "MIT",
   "dependencies": {
-    "@capacitor/android": "7.4.3"
+    "@capacitor/android": "7.4.3",
+    "fluent-ffmpeg": "2.1.3"
   },
   "devDependencies": {
     "@capacitor/assets": "3.0.5"
